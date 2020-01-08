@@ -7,11 +7,11 @@ Created on Tue Jan  7 03:17:34 2020
 """
 
 from flask import Flask, render_template, request, jsonify
-from flask import Request
-import tensorflow as tf
+#import tensorflow as tf
 import os
-import cv2
-import math
+import base64
+import numpy as np
+import json
 
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.basename('uploads')
@@ -23,11 +23,14 @@ classes = ["normal", "cancer"]
 @app.route('/', methods = ['GET', 'POST'])
 def index_api_call():
     #model  = tf.keras.models.load_model("model/ddsm_vgg16_s10_[512-512-1024]x2_hybrid.h5")
-    if Request.json:
-        image_recieved = Request.get_json()
+    image_recieved = request.get_json()
+    #image = base64.b64decode(image_recieved)
+    #image = cv2.imdecode(np.fromstring(image_recieved.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    print("******************")
     print(image_recieved)
-    result = "bhai result aaagya mubarook"
-    return jsonify(result)
+    print("******************")
+    image2 = 'nothing'
+    return jsonify(image2)
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0',port = '8000')

@@ -12,7 +12,7 @@ document.querySelector('form').addEventListener('submit', () => {
         console.log(image);
     }
     reader.readAsDataURL(file)
-    const data = { username: 'example' };
+    //const data = { username: 'example' };
 
     fetch('http://0.0.0.0:5000/', {
     method: 'POST', // or 'PUT'
