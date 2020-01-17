@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 16 17:25:06 2020
+
+@author: kazzastic
+"""
+
+import googleapiclient.discovery
+import cv2
+import numpy as np
+import base64
+
+def explicit_compute_engine(project):
+    from google.auth import compute_engine
+    from google.cloud import storage
+
+    # Explicitly use Compute Engine credentials. These credentials are
+    # available on Compute Engine, App Engine Flexible, and Container Engine.
+    credentials = compute_engine.Credentials()
+
+    # Create the client using the credentials and specifying a project ID.
+    storage_client = storage.Client(credentials=credentials, project=project)
+
+    # Make an authenticated API request
+    buckets = list(storage_client.list_buckets())
+    print(buckets)
+
+def predict_json(project, model, instances, version=None):
+    #explicit()
+    service = googleapiclient.discovery.build('ml', 'v1')
+    name = 'projects/{}/models/{}'.format(project, model)
+
+    if version is not None:
+        name += '/versions/{}'.format(version)
+
+    response = service.projects().predict(
+        name=name,
+        body={'instances': [{'b64': instances}]}
+    ).execute()
+
+    if 'error' in response:
+        raise RuntimeError(response['error'])
+
+    return response['predictions']
+
+def load_image(image_str):
+    img = cv2.imread(image_str)
+    print(img)
+    data = {}
+    with open(image_str, mode='rb') as file:
+        img = file.read()
+    data['img'] = base64.encodebytes(img).decode("utf-8")
+    instance = data['img']
+    instance = bytes(instance, 'utf-8')
+    print(type(instance))
+    new_instance = np.frombuffer(instance, dtype =np.uint8)
+    print(new_instance)
+    print(type(instance))
+    
+    return instance
+
+if __name__ == '__main__':
+    model = 'CancerPredictor'
+    instances = load_image('cancer.jpg')
+    project = 'proud-storm-265122'
+    version = 'v1'
+    predict_json(project, model, instances, version)
+    #explicit_compute_engine(project)
