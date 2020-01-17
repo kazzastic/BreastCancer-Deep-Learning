@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 import base64
 
+
 def explicit_compute_engine(project):
     from google.auth import compute_engine
     from google.cloud import storage
@@ -26,8 +27,9 @@ def explicit_compute_engine(project):
     buckets = list(storage_client.list_buckets())
     print(buckets)
 
+
 def predict_json(project, model, instances, version=None):
-    #explicit()
+    # explicit()
     service = googleapiclient.discovery.build('ml', 'v1')
     name = 'projects/{}/models/{}'.format(project, model)
 
@@ -44,6 +46,7 @@ def predict_json(project, model, instances, version=None):
 
     return response['predictions']
 
+
 def load_image(image_str):
     img = cv2.imread(image_str)
     print(img)
@@ -51,14 +54,18 @@ def load_image(image_str):
     with open(image_str, mode='rb') as file:
         img = file.read()
     data['img'] = base64.encodebytes(img).decode("utf-8")
-    instance = data['img']
-    instance = bytes(instance, 'utf-8')
-    print(type(instance))
-    new_instance = np.frombuffer(instance, dtype =np.uint8)
-    print(new_instance)
-    print(type(instance))
+    instance = data['img']  # send this on server
+
+    '''this is the logic to decode the image for preprocessing on model side
+    img_str_to_bytes = bytes(instance, 'utf-8')
+    with open('temp.jpg' , 'wb') as tmp: #converting bytes to temporary image on model side
+        tmp.write(base64.decodebytes(img_str_to_bytes))
     
+    image_to_numpy_preprocess = cv2.imread('temp.jpg')
+    print(img_str_to_bytes)
+    '''
     return instance
+
 
 if __name__ == '__main__':
     model = 'CancerPredictor'
@@ -66,4 +73,4 @@ if __name__ == '__main__':
     project = 'proud-storm-265122'
     version = 'v1'
     predict_json(project, model, instances, version)
-    #explicit_compute_engine(project)
+    # explicit_compute_engine(project)
