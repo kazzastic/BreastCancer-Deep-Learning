@@ -38,7 +38,7 @@ def predict_json(project, model, instances, version=None):
 
     response = service.projects().predict(
         name=name,
-        body={'instances': [{'b64': instances}]}
+        body={'instances': [{'image_bytes': {'b64': instances}}]}
     ).execute()
 
     if 'error' in response:
