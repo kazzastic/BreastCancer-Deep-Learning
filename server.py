@@ -14,6 +14,7 @@ import numpy as np
 import base64
 import cv2
 from util import convertToJpg, allowed_file
+import aws
 
 # import model functionality
 
@@ -44,24 +45,17 @@ def process_image():
 
     if (not imgdata) and (filename == '') and (not allowed_file(filename)):
         return jsonify({'message': "Invalid Image.", 'code': 400})
-        # code: 400 for bad request
 
     with open(os.path.join(app.config['UPLOAD_FOLDER'],
                            filename), 'wb') as f:
         f.write(imgdata)
 
-    # use this as image path for model
     filepath_for_model = convertToJpg(app, filename)
 
     response = {}
+    prediction_result = aws.invoke_model(filepath_for_model)
 
-    '''
-    model_response = Call_Model(filepath_for_model) #call model functionality
-    response['message'] = model_response  #add model response to response obj
-    response['further_details'] = ... # add further details about result as needed
-    response['code'] = 200 #succesfull response
-    '''
-    response['message'] = "Model Prediction."  # for sake of testing
+    response['data'] = prediction_result
     response['code'] = 200
 
     return jsonify(response)

@@ -11,7 +11,7 @@ const predictBtn = document.getElementById("predict-btn");
 const spinnerBtn = document.getElementById("spinner-div");
 const resultDiv = document.getElementById("result-div");
 const resultLabel = document.getElementById("result-label");
-
+var preds = ["cancer", "normal"];
 const enableThumbnail = file => {
   thumbnailElement.style.display = "block";
   thumbnailElement.src = file;
@@ -55,11 +55,15 @@ const handleSubmit = e => {
     })
       .then(response => response.json())
       .then(payload => {
+        console.log(payload);
         spinnerBtn.style.display = "none";
         if (payload.code === 400) throw payload.message; // a bad request
         resultDiv.style.display = "block";
-        resultLabel.textContent = payload.message; //showing api response
-
+        var cancer;
+        var normal;
+        cancer = "Cancer: " + Math.ceil(payload.data[0] * 100) + " %";
+        normal = "Normal: " + Math.ceil(payload.data[1] * 100) + " %";
+        resultLabel.textContent = cancer + "," + normal; //showing api response
         uploadBtn.disabled = true;
         predictBtn.disabled = true;
         fileInput.value = "";
